@@ -1,3 +1,4 @@
+import enum
 from abc import ABC, abstractmethod
 
 
@@ -67,12 +68,23 @@ class Spain(Country):
         return Madrid()
 
 
+class CountryEnum(enum.Enum):
+    Ukraine = 0
+    SPAIN = 1
+
+
+class CountryProvider:
+    @staticmethod
+    def create(n: int) -> Country:
+        match n:
+            case CountryEnum.Ukraine.value:
+                return Ukraine()
+            case CountryEnum.SPAIN.value:
+                return Spain()
+
+
 if __name__ == "__main__":
     num = int(input())
-    match num:
-        case 0:
-            country = Ukraine()
-            print(country.info())
-        case 1:
-            country = Spain()
-            print(country.info())
+    country = CountryProvider.create(num)
+    info = country.info()
+    print(info)
