@@ -22,13 +22,13 @@ class Polygon:
         return self.__params
 
     @property
-    def radius(self):
+    def radius(self) -> float:
         xs, ys = self.__params.start
         xe, ye = self.__params.end
         return sqrt((xe - xs) ** 2 + (ye - ys) ** 2)
 
     @property
-    def area(self):
+    def area(self) -> float:
         n = self.__params.n
         r = self.radius
         return (n * r ** 2) * sin(pi * 2 / n) / 2
@@ -39,10 +39,10 @@ class PolygonFactory:
         self.__polygons: dict[str, Polygon] = {}
 
     @staticmethod
-    def __to_key(params: PolygonParams):
+    def __to_key(params: PolygonParams) -> str:
         return json.dumps(asdict(params))
 
-    def create(self, params: PolygonParams):
+    def create(self, params: PolygonParams) -> Polygon:
         key = PolygonFactory.__to_key(params)
         if not self.__polygons.get(key):
             self.__polygons[key] = Polygon(params)
