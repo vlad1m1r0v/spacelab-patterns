@@ -57,4 +57,5 @@ if __name__ == "__main__":
     polygon_factory = PolygonFactory()
     first_square = polygon_factory.create(square_params)
     second_square = polygon_factory.create(square_params)
-    print(id(first_square) == id(second_square))
+    print(f"Second square is the first one: {id(first_square) == id(second_square)}")
+    print(f"Length stays one ofter putting 2 objects with equal params: {len(polygon_factory) == 1}")
