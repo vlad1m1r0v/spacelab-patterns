@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from collections import deque
 from time import strftime, localtime
@@ -18,6 +19,7 @@ class BalanceMemento(Memento):
     def __init__(self, amount: float):
         self._amount = amount
         self._time = strftime("%H:%M:%S", localtime())
+        print(f"New save. Amount = {self._amount}, Time = {self._time}")
 
     def get_state(self):
         return self._amount
@@ -69,10 +71,15 @@ if __name__ == "__main__":
     balance = Balance(2_000)
     print(f"Initial balance: {balance.amount}")
     user = User(balance)
+    # after init
+    user.save()
     balance.replenish(500)
+    # after replenish
     user.save()
     print(f"Balance after replenish: {balance.amount}")
+    time.sleep(5.0)
     balance.withdraw(200)
+    # after withdraw+ ge
     user.save()
     print(f"Balance after withdraw: {balance.amount}")
     user.restore()
