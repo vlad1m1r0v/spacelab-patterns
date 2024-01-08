@@ -40,6 +40,10 @@ class Mediator(ABC):
     def add_worker(self, worker: "Worker") -> None:
         ...
 
+    @abstractmethod
+    def remove_worker(self, worker: "Worker") -> None:
+        ...
+
 
 class Worker(ABC):
     def __init__(self, name: str, m: Mediator):
@@ -77,7 +81,7 @@ class Waiter(Worker):
     def finish_order(self, order: Order):
         sleep(0.5)
         print(f"Waiter {self.name} gave {order} to the client")
-        print("-"*80)
+        print("-" * 80)
         self.orders.remove(order)
 
     def type(self) -> WorkerType:
