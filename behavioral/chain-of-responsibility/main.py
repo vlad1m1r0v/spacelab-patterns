@@ -9,7 +9,7 @@ class Handler(ABC):
         ...
 
     @abstractmethod
-    def handle(self, request) -> Optional[str]:
+    def handle(self, message: str) -> Optional[str]:
         ...
 
 
