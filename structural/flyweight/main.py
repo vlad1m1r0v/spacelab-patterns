@@ -1,61 +1,74 @@
-import json
-from dataclasses import dataclass, asdict
-from math import sqrt, sin, pi
-from typing import TypeAlias
-
-Point: TypeAlias = tuple[float, float]
+from os import getcwd
+import datetime
+from enum import StrEnum, auto
+from typing import Dict, List
 
 
-@dataclass
-class PolygonParams:
-    n: int
-    start: Point
-    end: Point
+def current_year():
+    today = datetime.date.today()
+    return today.year
 
 
-class Polygon:
-    def __init__(self, params: PolygonParams):
-        self.__params = params
-
-    @property
-    def params(self):
-        return self.__params
-
-    @property
-    def radius(self) -> float:
-        xs, ys = self.__params.start
-        xe, ye = self.__params.end
-        return sqrt((xe - xs) ** 2 + (ye - ys) ** 2)
-
-    @property
-    def area(self) -> float:
-        n = self.__params.n
-        r = self.radius
-        return (n * r ** 2) * sin(pi * 2 / n) / 2
+class LicenseType(StrEnum):
+    MIT = auto()
+    ISC = auto()
+    GNU = auto()
 
 
-class PolygonFactory:
-    def __init__(self):
-        self.__polygons: dict[str, Polygon] = {}
+class License:
+    def __init__(self, license_type: LicenseType):
+        self.license_type = license_type
+        with open(f"{getcwd()}/licenses/{self.license_type.upper()}.txt", "r") as f:
+            self.description = "".join(f.readlines())
+
+
+class Repository:
+    def __init__(self, author: str, license: License) -> None:
+        self.author = author
+        self.year = current_year()
+        self.license = license
+
+    def show_license(self) -> None:
+        with_author = self.license.description.replace("<author>", self.author)
+        with_author_and_year = with_author.replace("<year>", str(self.year))
+        print(with_author_and_year)
+
+
+class LicenseFactory:
+    _licenses: Dict[int, License] = {}
+
+    def __init__(self, licenses: List[License]) -> None:
+        for license in licenses:
+            self._licenses[self.get_key(license.license_type)] = license
 
     @staticmethod
-    def __to_key(params: PolygonParams) -> str:
-        return json.dumps(asdict(params))
+    def get_key(license_type: LicenseType) -> int:
+        return hash(license_type)
 
-    def create(self, params: PolygonParams) -> Polygon:
-        key = PolygonFactory.__to_key(params)
-        if not self.__polygons.get(key):
-            self.__polygons[key] = Polygon(params)
-        return self.__polygons.get(key)
+    def get_license(self, license_type: LicenseType) -> License:
+        key = self.get_key(license_type)
+        if not self._licenses.get(key):
+            print("Creating new flyweight license\n")
+            license = License(license_type)
+        else:
+            print("Get existing flyweight license\n")
+            license = self._licenses.get(key)
+        return license
 
-    def __len__(self):
-        return len(self.__polygons)
+
+def create_repository(f: LicenseFactory, author: str, license_type: LicenseType):
+    license = f.get_license(license_type)
+    repository = Repository(author, license)
+    repository.show_license()
 
 
 if __name__ == "__main__":
-    square_params = PolygonParams(n=2, start=(0.0, 0.0), end=(1.0, 2.0))
-    polygon_factory = PolygonFactory()
-    first_square = polygon_factory.create(square_params)
-    second_square = polygon_factory.create(square_params)
-    print(f"Second square is the first one: {id(first_square) == id(second_square)}")
-    print(f"Length stays one ofter putting 2 objects with equal params: {len(polygon_factory) == 1}")
+    mit = License(LicenseType.MIT)
+    # isc = License(LicenseType.ISC)
+    gnu = License(LicenseType.GNU)
+
+    factory = LicenseFactory([mit, gnu])
+
+    create_repository(factory, author="Artem Vladimirov", license_type=LicenseType.MIT)
+    print("\n")
+    create_repository(factory, author="Pavlo Tsaruk", license_type=LicenseType.ISC)

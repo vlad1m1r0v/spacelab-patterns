@@ -21,4 +21,3 @@ if __name__ == "__main__":
     p1 = Plain(width=10, height=10)
     p2 = Plain(width=20, height=20)
     print(f"p1 and p2 are the same objects: {str(id(p1) == id(p2))}")
-
